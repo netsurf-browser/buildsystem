@@ -286,6 +286,25 @@ define install_shared_lib
   $(INSTALL) $(INSTALLFLAGS) -m 755 $1 $2/$(notdir $1)
   $(LN) $(LNFLAGS) -f -s $(notdir $1) $2/$(SONAME)
   $(LN) $(LNFLAGS) -f -s $(notdir $1) $2/$(SHAREDLIBNAME)
+
+endef
+
+# Install a binary or normal file ($1) to the specified location ($2)
+define install_binary_or_normal_file
+  $(if $(and $(filter binary,$(COMPONENT_TYPE)), \
+             $(filter $(OUTPUT),$1)), \
+    $(INSTALL) $(INSTALLFLAGS) -m 755 $1 $2,
+    $(INSTALL) $(INSTALLFLAGS) -m 644 $1 $2)
+
+endef
+
+# Install a non-pkgconfig file ($1) to the specified location ($2)
+define install_non_pkgconfig
+  $(if $(and $(filter lib-shared,$(COMPONENT_TYPE)), \
+             $(filter $(OUTPUT),$1)), \
+    $(call install_shared_lib,$1,$2), \
+    $(call install_binary_or_normal_file,$1,$2))
+
 endef
 
 # Install a file ($1) to the specified location ($2)
@@ -293,10 +312,7 @@ define install_file
   $(if $1, \
     $(if $(findstring .pc.in,$1), \
       $(call install_pkgconfig,$1,$2), \
-      $(if $(and $(filter lib-shared,$(COMPONENT_TYPE)), \
-		$(filter $(OUTPUT),$1)), \
-	$(call install_shared_lib,$1,$2), \
-	$(INSTALL) $(INSTALLFLAGS) -m 644 $1 $2)))
+      $(call install_non_pkgconfig,$1,$2)))
 
 endef
 
