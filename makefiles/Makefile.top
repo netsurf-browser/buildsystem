@@ -293,7 +293,7 @@ endef
 define install_binary_or_normal_file
   $(if $(and $(filter binary,$(COMPONENT_TYPE)), \
              $(filter $(OUTPUT),$1)), \
-    $(INSTALL) $(INSTALLFLAGS) -m 755 $1 $2,
+    $(INSTALL) $(INSTALLFLAGS) -m 755 $1 $2, \
     $(INSTALL) $(INSTALLFLAGS) -m 644 $1 $2)
 
 endef
