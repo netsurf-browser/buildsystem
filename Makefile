@@ -9,7 +9,7 @@ usage:
 
 PREFIX?=/opt/netsurf
 
-BASE=$(PREFIX)/share/netsurf-buildsystem
+BASE=$(DESTDIR)$(PREFIX)/share/netsurf-buildsystem
 
 MAKEFILES := $(patsubst %,Makefile.%,	\
 	top tools subdir pkgconfig 	\
