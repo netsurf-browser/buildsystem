@@ -42,8 +42,8 @@ install:
 #   the Makefile component version matches the git tag version and the 
 #   tar is apropriately named for the component being generated
 dist:
-	$(eval GIT_TAG := $(shell git describe --abbrev=0 --match "v*"))
-	$(eval GIT_VER := $(shell x="$(GIT_TAG)"; echo "$${x#v}"))
+	$(eval GIT_TAG := $(shell git describe --abbrev=0 --match "release/*"))
+	$(eval GIT_VER := $(shell x="$(GIT_TAG)"; echo "$${x#release/}"))
 	$(if $(subst $(GIT_VER),,$(COMPONENT_VERSION)), $(error Component Version "$(COMPONENT_VERSION)" and GIT tag version "$(GIT_VER)" do not match))
 	$(eval DIST_FILE := $(COMPONENT)-${GIT_VER})
 	$(Q)git archive --format=tar.gz --prefix=$(DIST_FILE)/ -o $(DIST_FILE).tar.gz $(GIT_TAG)
