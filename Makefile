@@ -45,5 +45,5 @@ dist:
 	$(eval GIT_TAG := $(shell git describe --abbrev=0 --match "v*"))
 	$(eval GIT_VER := $(shell x="$(GIT_TAG)"; echo "$${x#v}"))
 	$(if $(subst $(GIT_VER),,$(COMPONENT_VERSION)), $(error Component Version "$(COMPONENT_VERSION)" and GIT tag version "$(GIT_VER)" do not match))
-	$(eval DIST_FILE := lib$(COMPONENT)-${GIT_VER})
+	$(eval DIST_FILE := $(COMPONENT)-${GIT_VER})
 	$(Q)git archive --format=tar.gz --prefix=$(DIST_FILE)/ -o $(DIST_FILE).tar.gz $(GIT_TAG)
