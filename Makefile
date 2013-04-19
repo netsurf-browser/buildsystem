@@ -1,3 +1,13 @@
+#!/bin/make
+#
+# Makefile for NetSurf buildsystem
+#
+# Copyright 2009-1013 John-Mark Bell <jmb@netsurf-browser.org>
+
+# Component settings
+COMPONENT := buildsystem
+COMPONENT_VERSION := 1.0
+
 all: usage
 
 usage:
@@ -27,3 +37,13 @@ install:
 		cp testtools/$$T $(BASE)/testtools/; \
 	done
 
+# Distribution
+# This constructs a distribution tar from the last git tag. It ensures
+#   the Makefile component version matches the git tag version and the 
+#   tar is apropriately named for the component being generated
+dist:
+	$(eval GIT_TAG := $(shell git describe --abbrev=0 --match "v*"))
+	$(eval GIT_VER := $(shell x="$(GIT_TAG)"; echo "$${x#v}"))
+	$(if $(subst $(GIT_VER),,$(COMPONENT_VERSION)), $(error Component Version "$(COMPONENT_VERSION)" and GIT tag version "$(GIT_VER)" do not match))
+	$(eval DIST_FILE := lib$(COMPONENT)-${GIT_VER})
+	$(Q)git archive --format=tar.gz --prefix=$(DIST_FILE)/ -o $(DIST_FILE).tar.gz $(GIT_TAG)
