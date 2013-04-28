@@ -6,7 +6,9 @@
 
 # Component settings
 COMPONENT := buildsystem
-COMPONENT_VERSION := 1.0
+COMPONENT_VERSION := 1.1
+
+.PHONY:all usage install dist clean distclean
 
 all: usage
 
@@ -47,3 +49,9 @@ dist:
 	$(if $(subst $(GIT_VER),,$(COMPONENT_VERSION)), $(error Component Version "$(COMPONENT_VERSION)" and GIT tag version "$(GIT_VER)" do not match))
 	$(eval DIST_FILE := $(COMPONENT)-${GIT_VER})
 	$(Q)git archive --format=tar.gz --prefix=$(DIST_FILE)/ -o $(DIST_FILE).tar.gz $(GIT_TAG)
+
+# dummy clean target
+clean:
+
+# dummy distribution clean target
+distclean:
