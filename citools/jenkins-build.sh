@@ -81,6 +81,9 @@ case ${TARGET} in
 	TARGET="m5475_atari"
 	;;
 
+    "powerpc-apple-darwin9")
+	TARGET="powerpc_apple_darwin9"
+	;;
 esac
 
 # Ensure the artifact target directory exists
