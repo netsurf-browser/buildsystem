@@ -74,15 +74,19 @@ esac
 # here is also where we can adjust other setting based on target
 case ${TARGET} in
     "m68k-atari-mint")
-	TARGET="atari"
+	TARGET_TARGET="atari"
 	;;
 
     "m5475-atari-mint")
-	TARGET="m5475_atari"
+	TARGET_TARGET="m5475_atari"
 	;;
 
     "powerpc-apple-darwin9")
-	TARGET="powerpc_apple_darwin9"
+	TARGET_TARGET="powerpc_apple_darwin9"
+	;;
+
+    *)
+	TARGET_TARGET=${TARGET}
 	;;
 esac
 
@@ -98,22 +102,22 @@ export PATH=${PATH}:${PREFIX}/bin
 # execute the build steps
 
 # clean target is always first
-make Q= clean TARGET=${TARGET} BUILD=${TARGET_BUILD}
+make Q= clean TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
 
 # either a coverage build or a normal one
 if [ "x${TARGET}" = "x${TARGET_COVERAGE}" ]; then
-    make Q= TARGET=${TARGET} BUILD=${TARGET_BUILD} coverage
+    make Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD} coverage
     gcovr -x -r .. -o coverage.xml
 else
-    make Q= TARGET=${TARGET} BUILD=${TARGET_BUILD}
+    make Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
 fi
 
 # test if appropriate
 if [ "x${TARGET}" = "x${TARGET_TEST}" ]; then
-    make Q= TARGET=${TARGET} BUILD=${TARGET_BUILD} test
+    make Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD} test
 fi
 
 # install
 if [ "x${TARGET}" = "x${TARGET_INSTALL}" ]; then
-    make Q= TARGET=${TARGET} BUILD=${TARGET_BUILD} install
+    make Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD} install
 fi
