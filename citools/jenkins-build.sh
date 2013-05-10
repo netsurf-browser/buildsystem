@@ -47,7 +47,7 @@ NATIVE_TARGET=$(uname -s)
 TARGET_TEST=
 TARGET_INSTALL=
 TARGET_COVERAGE=
-TARGET_BUILD=release
+TARGET_BUILD="release"
 
 # change defaults based on build parameter
 case $1 in
@@ -57,7 +57,7 @@ case $1 in
 
     "coverage")
 	TARGET_COVERAGE=${TARGET}
-	TARGET_BUILD=debug
+	TARGET_BUILD="debug"
 	# need to disable ccache on coverage builds
 	export CCACHE=
 	;;
@@ -74,11 +74,11 @@ esac
 # here is also where we can adjust other setting based on target
 case ${TARGET} in
     "m68k-atari-mint")
-	TARGET=atari
+	TARGET="atari"
 	;;
 
     "m5475-atari-mint")
-	TARGET=m5475_atari
+	TARGET="m5475_atari"
 	;;
 
 esac
@@ -95,22 +95,22 @@ export PATH=${PATH}:${PREFIX}/bin
 # execute the build steps
 
 # clean target is always first
-make clean TARGET=${TARGET} BUILD=${TARGET_BUILD}
+make Q= clean TARGET=${TARGET} BUILD=${TARGET_BUILD}
 
 # either a coverage build or a normal one
 if [ "x${TARGET}" = "x${TARGET_COVERAGE}" ]; then
-    make TARGET=${TARGET} BUILD=${TARGET_BUILD} coverage
+    make Q= TARGET=${TARGET} BUILD=${TARGET_BUILD} coverage
     gcovr -x -r .. -o coverage.xml
 else
-    make TARGET=${TARGET} BUILD=${TARGET_BUILD}
+    make Q= TARGET=${TARGET} BUILD=${TARGET_BUILD}
 fi
 
 # test if appropriate
 if [ "x${TARGET}" = "x${TARGET_TEST}" ]; then
-    make TARGET=${TARGET} BUILD=${TARGET_BUILD} test
+    make Q= TARGET=${TARGET} BUILD=${TARGET_BUILD} test
 fi
 
 # install
 if [ "x${TARGET}" = "x${TARGET_INSTALL}" ]; then
-    make TARGET=${TARGET} BUILD=${TARGET_BUILD} install
+    make Q= TARGET=${TARGET} BUILD=${TARGET_BUILD} install
 fi
