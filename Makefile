@@ -30,13 +30,18 @@ MAKEFILES := $(patsubst %,Makefile.%,	\
 
 TESTTOOLS := testrunner.pl
 
+CITOOLS := jenkins-build.sh
+
 install:
-	mkdir -p $(BASE)/makefiles $(BASE)/testtools
+	mkdir -p $(BASE)/makefiles $(BASE)/testtools $(BASE)/citools
 	for M in $(MAKEFILES); do \
 		cp makefiles/$$M $(BASE)/makefiles/; \
 	done
 	for T in $(TESTTOOLS); do \
 		cp testtools/$$T $(BASE)/testtools/; \
+	done
+	for C in $(CITOOLS); do \
+		cp citools/$$C $(BASE)/citools/; \
 	done
 
 # Distribution
