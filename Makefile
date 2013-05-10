@@ -8,7 +8,7 @@
 COMPONENT := buildsystem
 COMPONENT_VERSION := 1.1
 
-.PHONY:all usage install dist clean distclean
+.PHONY:all usage install dist clean distclean test
 
 all: usage
 
@@ -60,3 +60,6 @@ clean:
 
 # dummy distribution clean target
 distclean:
+
+# dummy test target
+test:
