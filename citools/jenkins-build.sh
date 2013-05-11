@@ -24,9 +24,12 @@
 #
 # This script may be executed by jenkins jobs that use the core buildsystem
 #
-# Usage: jenkins-build.sh [install|test-install|coverage]
+# Usage: jenkins-build.sh [install|test-install|coverage|static]
 #
-
+# install - build and install
+# test-install - build, test and install
+# coverage - run coverage
+# static - perform a staic anaysis 
 
 # TARGET must be in the environment and set correctly
 if [ "x${TARGET}" = "x" ];then
@@ -47,10 +50,11 @@ NATIVE_TARGET=$(uname -s)
 TARGET_TEST=
 TARGET_INSTALL=
 TARGET_COVERAGE=
+TARGET_STATIC=
 TARGET_BUILD="release"
 
 # change defaults based on build parameter
-case $1 in
+case "$1" in
     "install")
 	TARGET_INSTALL=${TARGET}
 	;;
@@ -62,11 +66,30 @@ case $1 in
 	export CCACHE=
 	;;
 
-    "test-install"|*)
+    "static")
+	TARGET_STATIC=${TARGET}
+	TARGET_BUILD="debug"
+	# need to disable ccache on static builds
+	export CCACHE=
+	;;
+
+    "test-install"|"")
 	# Currently most tests do not work on targets except for Linux
 	# TARGET_TEST=${NATIVE_TARGET}
 	TARGET_TEST="Linux"
 	TARGET_INSTALL=${TARGET}
+	;;
+
+    *)
+	cat <<EOF
+Usage: jenkins-build.sh [install|test-install|coverage|static]
+
+       install        build and install
+       test-install   build, test and install
+       coverage       run coverage
+       static         perform a staic anaysis 
+EOF
+	exit 1
 	;;
 esac
 
@@ -104,12 +127,25 @@ export PATH=${PATH}:${PREFIX}/bin
 # clean target is always first
 make Q= clean TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
 
-# either a coverage build or a normal one
+# build as per type requested
 if [ "x${TARGET}" = "x${TARGET_COVERAGE}" ]; then
+    # Coverage Build
     make Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD} coverage
     gcovr -x -r .. -o coverage.xml
+
+elif [ "x${TARGET}" = "x${TARGET_STATIC}" ]; then
+    # static build
+    rm -rf clangScanBuildReports
+
+    scan-build -o clangScanBuildReports -v --use-cc clang --use-analyzer=/usr/bin/clang make BUILD=debug
+
+    # clean up after
+    make Q= clean TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
+
 else
+    # Normal build
     make Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
+
 fi
 
 # test if appropriate
