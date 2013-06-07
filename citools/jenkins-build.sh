@@ -73,7 +73,14 @@ case "$1" in
 	export CCACHE=
 	;;
 
-    "test-install"|"")
+    "test-install")
+	# Perfom test if being executed on native target
+	TARGET_TEST=${NATIVE_TARGET}
+	TARGET_INSTALL=${TARGET}
+	;;
+
+    "")
+	# default is test only on Linux and install
 	# Currently most tests do not work on targets except for Linux
 	# TARGET_TEST=${NATIVE_TARGET}
 	TARGET_TEST="Linux"
