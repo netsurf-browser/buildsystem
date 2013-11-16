@@ -184,7 +184,7 @@ elif [ "x${TARGET}" = "x${TARGET_COVERITY}" ]; then
     # cleanup before we start
     rm -rf cov-int/ coverity-scan.tar.gz coverity-scan.tar
 
-    cov-build --dir cov-int make Q= clean TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
+    cov-build --dir cov-int make Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
 
     tar cf coverity-scan.tar
 
