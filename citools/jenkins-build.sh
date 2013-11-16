@@ -162,13 +162,22 @@ elif [ "x${TARGET}" = "x${TARGET_STATIC}" ]; then
 elif [ "x${TARGET}" = "x${TARGET_COVERITY}" ]; then
     # coverity build
 
+    # Check thses are set
+    #
+    # COVERITY_PROJECT
     # COVERITY_TOKEN
     # COVERITY_USER
     # COVERITY_PREFIX
 
+    if [ -n "${COVERITY_PROJECT}" -o -n "${COVERITY_TOKEN}" -o -n "${COVERITY_USER}" -o -n "${COVERITY_PREFIX}" ]; then
+	echo "Coverity parameters not set"
+	exit 1
+    fi
+
     # Coverity tools location
     COVERITY_PREFIX=${COVERITY_PREFIX:-/opt/coverity/cov-analysis-linux64-6.6.1}
     COVERITY_VERSION=$(git rev-parse HEAD)
+
 
     export PATH=${PATH}:${COVERITY_PREFIX}/bin
 
@@ -181,7 +190,7 @@ elif [ "x${TARGET}" = "x${TARGET_COVERITY}" ]; then
 
     gzip -9 coverity-scan.tar
 
-    curl --form "project=NetSurf" --form "token=${COVERITY_TOKEN}" --form "email=${COVERITY_USER}" --form "file=@coverity-scan.tar.gz" --form "version=${COVERITY_VERSION}" --form "description=Git Head build" http://scan5.coverity.com/cgi-bin/upload.py
+    curl --form "project=${COVERITY_PROJECT}" --form "token=${COVERITY_TOKEN}" --form "email=${COVERITY_USER}" --form "file=@coverity-scan.tar.gz" --form "version=${COVERITY_VERSION}" --form "description=Git Head build" http://scan5.coverity.com/cgi-bin/upload.py
 
 else
     # Normal build
