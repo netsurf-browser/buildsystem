@@ -169,7 +169,7 @@ elif [ "x${TARGET}" = "x${TARGET_COVERITY}" ]; then
     # COVERITY_USER
     # COVERITY_PREFIX
 
-    if [ -n "${COVERITY_PROJECT}" -o -n "${COVERITY_TOKEN}" -o -n "${COVERITY_USER}" -o -n "${COVERITY_PREFIX}" ]; then
+    if [ -z "${COVERITY_PROJECT}" -o -z "${COVERITY_TOKEN}" -o -z "${COVERITY_USER}" -o -z "${COVERITY_PREFIX}" ]; then
 	echo "Coverity parameters not set"
 	exit 1
     fi
