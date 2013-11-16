@@ -186,7 +186,7 @@ elif [ "x${TARGET}" = "x${TARGET_COVERITY}" ]; then
 
     cov-build --dir cov-int make Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
 
-    tar cf coverity-scan.tar
+    tar cf coverity-scan.tar cov-int
 
     gzip -9 coverity-scan.tar
 
