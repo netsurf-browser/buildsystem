@@ -29,7 +29,8 @@
 # install - build and install
 # test-install - build, test and install
 # coverage - run coverage
-# static - perform a staic anaysis 
+# static - perform a static analysis
+# coverity - perform a coverity scan
 
 # TARGET must be in the environment and set correctly
 if [ "x${TARGET}" = "x" ];then
@@ -51,6 +52,7 @@ TARGET_TEST=
 TARGET_INSTALL=
 TARGET_COVERAGE=
 TARGET_STATIC=
+TARGET_COVERITY=
 TARGET_BUILD="release"
 
 # change defaults based on build parameter
@@ -70,6 +72,13 @@ case "$1" in
 	TARGET_STATIC=${TARGET}
 	TARGET_BUILD="debug"
 	# need to disable ccache on static builds
+	export CCACHE=
+	;;
+
+    "coverity")
+	TARGET_COVERITY=${TARGET}
+	TARGET_BUILD="debug"
+	# need to disable ccache on coverity builds
 	export CCACHE=
 	;;
 
@@ -94,7 +103,8 @@ Usage: jenkins-build.sh [install|test-install|coverage|static]
        install        build and install
        test-install   build, test and install
        coverage       run coverage
-       static         perform a staic anaysis 
+       static         perform a static anaysis
+       coverity       perform a coverity scan
 EOF
 	exit 1
 	;;
@@ -148,6 +158,30 @@ elif [ "x${TARGET}" = "x${TARGET_STATIC}" ]; then
 
     # clean up after
     make Q= clean TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
+
+elif [ "x${TARGET}" = "x${TARGET_COVERITY}" ]; then
+    # coverity build
+
+    # COVERITY_TOKEN
+    # COVERITY_USER
+    # COVERITY_PREFIX
+
+    # Coverity tools location
+    COVERITY_PREFIX=${COVERITY_PREFIX:-/opt/coverity/cov-analysis-linux64-6.6.1}
+    COVERITY_VERSION=$(git rev-parse HEAD)
+
+    export PATH=${PATH}:${COVERITY_PREFIX}/bin
+
+    # cleanup before we start
+    rm -rf cov-int/ coverity-scan.tar.gz coverity-scan.tar
+
+    cov-build --dir cov-int make Q= clean TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
+
+    tar cf coverity-scan.tar
+
+    gzip -9 coverity-scan.tar
+
+    curl --form "project=NetSurf" --form "token=${COVERITY_TOKEN}" --form "email=${COVERITY_USER}" --form "file=@coverity-scan.tar.gz" --form "version=${COVERITY_VERSION}" --form "description=Git Head build" http://scan5.coverity.com/cgi-bin/upload.py
 
 else
     # Normal build
