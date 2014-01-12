@@ -19,6 +19,8 @@
 # TARGET		Target platform (defaults to host)
 # PREFIX		Absolute installation path prefix 
 # 				(defaults to /usr/local)
+# LIBDIR		Library installation directory in ${PREFIX}
+# 				(defaults to lib)
 #
 
 ###############################################################################
@@ -367,6 +369,9 @@ endif
 
 # Default prefix
 PREFIX ?= /usr/local
+
+# Default libdir
+LIBDIR ?= lib
 
 ###############################################################################
 # Tool defaults

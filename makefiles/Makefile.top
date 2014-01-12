@@ -287,6 +287,7 @@ define install_pkgconfig
 	$(Q)$(ECHO) $(ECHOFLAGS) "sed -e... $1 >$(BUILDDIR)/$(1:.in=)"
 	$(Q)$(SED) \
 		-e 's#PREFIX#$(PREFIX)#' \
+		-e 's#LIBDIR#$(LIBDIR)#' \
 		-e 's#MAJOR#$(major-version)#' \
 		-e 's#MINOR#$(minor-version)#' \
 		-e 's#PATCH#$(patch-version)#' \
