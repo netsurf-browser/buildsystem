@@ -114,18 +114,27 @@ esac
 # here is also where we can adjust other setting based on target
 case ${TARGET} in
     "m68k-atari-mint")
+	MAKE=make
 	TARGET_TARGET="atari"
 	;;
 
     "m5475-atari-mint")
+	MAKE=make
 	TARGET_TARGET="m5475_atari"
 	;;
 
     "powerpc-apple-darwin9")
+	MAKE=make
 	TARGET_TARGET="powerpc_apple_darwin9"
 	;;
 
+    "OpenBSD")
+	MAKE=gmake
+	TARGET_TARGET=${TARGET}
+	;;    
+
     *)
+	MAKE=make
 	TARGET_TARGET=${TARGET}
 	;;
 esac
@@ -142,22 +151,22 @@ export PATH=${PATH}:${PREFIX}/bin
 # execute the build steps
 
 # clean target is always first
-make Q= clean TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
+${MAKE} Q= clean TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
 
 # build as per type requested
 if [ "x${TARGET}" = "x${TARGET_COVERAGE}" ]; then
     # Coverage Build
-    make Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD} coverage
+    ${MAKE} Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD} coverage
     gcovr -x -r .. -o coverage.xml
 
 elif [ "x${TARGET}" = "x${TARGET_STATIC}" ]; then
     # static build
     rm -rf clangScanBuildReports
 
-    scan-build -o clangScanBuildReports -v --use-cc clang --use-analyzer=/usr/bin/clang make BUILD=debug
+    scan-build -o clangScanBuildReports -v --use-cc clang --use-analyzer=/usr/bin/clang ${MAKE} BUILD=debug
 
     # clean up after
-    make Q= clean TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
+    ${MAKE} Q= clean TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
 
 elif [ "x${TARGET}" = "x${TARGET_COVERITY}" ]; then
     # coverity build
@@ -184,7 +193,7 @@ elif [ "x${TARGET}" = "x${TARGET_COVERITY}" ]; then
     # cleanup before we start
     rm -rf cov-int/ coverity-scan.tar.gz coverity-scan.tar
 
-    cov-build --dir cov-int make Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
+    cov-build --dir cov-int ${MAKE} Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
 
     tar cf coverity-scan.tar cov-int
 
@@ -194,16 +203,16 @@ elif [ "x${TARGET}" = "x${TARGET_COVERITY}" ]; then
 
 else
     # Normal build
-    make Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
+    ${MAKE} Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
 
 fi
 
 # test if appropriate
 if [ "x${TARGET}" = "x${TARGET_TEST}" ]; then
-    make Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD} test
+    ${MAKE} Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD} test
 fi
 
 # install
 if [ "x${TARGET}" = "x${TARGET_INSTALL}" ]; then
-    make Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD} install
+    ${MAKE} Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD} install
 fi
