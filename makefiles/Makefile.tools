@@ -367,6 +367,17 @@ ifeq ($(TARGET),m5475_atari)
   endif
 endif
 
+# OpenBSD
+ifeq ($(TARGET),OpenBSD)
+  ifeq ($(HOST),OpenBSD)
+    CFLAGS := $(CFLAGS) -I$(GCCSDK_INSTALL_ENV)/include -I/usr/local/include
+    CXXFLAGS := $(CXXFLAGS) -I$(GCCSDK_INSTALL_ENV)/include -I/usr/local/includ
+    LDFLAGS := $(LDFLAGS) -L$(GCCSDK_INSTALL_ENV)/lib -L/usr/local/lib
+
+    FLEX := gflex
+  endif
+endif
+
 # Default prefix
 PREFIX ?= /usr/local
 
@@ -419,6 +430,10 @@ SED ?= sed
 TOUCH ?= touch
 
 XSLTPROC ?= xsltproc
+
+FLEX ?= flex
+
+BISION ?= bison
 
 ###############################################################################
 # Override defaulted tools
