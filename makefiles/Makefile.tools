@@ -433,7 +433,7 @@ XSLTPROC ?= xsltproc
 
 FLEX ?= flex
 
-BISION ?= bison
+BISON ?= bison
 
 ###############################################################################
 # Override defaulted tools
