@@ -22,6 +22,8 @@
 # 				(defaults to /usr/local)
 # LIBDIR		Library installation directory in ${PREFIX}
 # 				(defaults to lib)
+# INCLUDEDIR	Header installation directory in ${PREFIX}
+# 				(defaults to include)
 #
 
 ###############################################################################
@@ -240,6 +242,9 @@ PREFIX ?= /usr/local
 
 # Default libdir
 LIBDIR ?= lib
+
+# Default includedir
+INCLUDEDIR ?= include
 
 ###############################################################################
 # Tool defaults

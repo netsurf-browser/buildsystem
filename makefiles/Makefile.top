@@ -295,6 +295,7 @@ define install_pkgconfig
 		-e 's#MAJOR#$(major-version)#' \
 		-e 's#MINOR#$(minor-version)#' \
 		-e 's#PATCH#$(patch-version)#' \
+		-e 's#INCLUDEDIR#$(INCLUDEDIR)#' \
 		-e 's#VERSION#$(COMPONENT_VERSION)#' \
 		-e 's#REQUIRED#$(__required)#' \
 		-e 's#LIBRARIES#$(__libraries)#' \
