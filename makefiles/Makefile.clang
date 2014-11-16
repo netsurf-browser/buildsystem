@@ -32,7 +32,7 @@ CFLAGS := $(CFLAGS) -D_ALIGNED="__attribute__((aligned))"
 # Mac OS X Universal Binaries
 ###############################################################################
 
-ifeq ($(TARGET),Darwin)
+ifeq ($(findstring darwin,$(BUILD)),darwin)
 	ifneq ($(UNIVERSAL),)
 		UNIVERSAL_FLAGS := $(foreach arch,$(UNIVERSAL),-arch $(arch) )
 		

@@ -51,7 +51,7 @@ endif
 
 # RISC OS module extensions
 ifeq ($(COMPONENT_TYPE),riscos-module)
-  ifneq ($(TARGET),riscos)
+  ifneq ($(BUILD),arm-unknown-riscos)
     $(error Attempting to build a RISC OS module for a non-RISC OS target)
   endif
 
@@ -64,7 +64,7 @@ endif
 # Mac OS X Universal Binaries
 ###############################################################################
 
-ifeq ($(TARGET),Darwin)
+ifeq ($(findstring darwin,$(BUILD)),darwin)
 	ifneq ($(UNIVERSAL),)
 		UNIVERSAL_FLAGS := $(foreach arch,$(UNIVERSAL),-arch $(arch) )
 		CC_CAN_BUILD_AND_DEP := no
