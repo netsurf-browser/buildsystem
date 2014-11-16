@@ -55,17 +55,13 @@ HOST_CC ?= cc
 # Host/build platform detection
 ###############################################################################
 
-# Autodetect build or CC
-CC__ := $(CC)
+# Autodetect build
 ifeq ($(BUILD),)
   BUILD := $(shell $(CC) -dumpmachine)
   ifeq ($(BUILD),)
     $(error "Failed to guess BUILD")
   endif
 else
-  ifeq ($(origin CC),default)
-    CC__ := $(BUILD)-gcc
-  endif
 endif
 
 # Autodetect host if necessary
@@ -75,6 +71,9 @@ ifeq ($(HOST),)
     $(error "Failed to guess HOST")
   endif
 endif
+
+# Make first-stab at identity of CC
+CC__ := $(CC)
 
 ifeq ($(HOST),$(BUILD))
   # Native build
@@ -103,6 +102,12 @@ ifeq ($(HOST),$(BUILD))
   endif
 else
   # Cross compiling
+
+  # Improve our guess at the identity of CC
+  # (only if CC was not specified by the user)
+  ifeq ($(origin CC),default)
+    CC__ := $(BUILD)-gcc
+  endif
 
   # Search the path for the compiler
   toolpath_ := $(shell /bin/which $(CC__))
