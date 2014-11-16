@@ -32,9 +32,9 @@
 # static - perform a static analysis
 # coverity - perform a coverity scan
 
-# TARGET must be in the environment and set correctly
-if [ "x${TARGET}" = "x" ];then
-    echo "TARGET unset"
+# BUILD must be in the environment and set correctly
+if [ "x${BUILD}" = "x" ];then
+    echo "BUILD unset"
     exit 1
 fi
 
@@ -42,10 +42,10 @@ fi
 #
 # This does mean the artifacts of a target must all be built on the
 #   same jenkins slave instance
-ARTIFACT_HOME=${JENKINS_HOME}/artifacts-${TARGET}
+ARTIFACT_HOME=${JENKINS_HOME}/artifacts-${BUILD}
 
 # Obtain the native target
-NATIVE_TARGET=$(uname -s)
+NATIVE_BUILD=$(cc -dumpmachine)
 
 # target defaults
 TARGET_TEST=
@@ -53,47 +53,47 @@ TARGET_INSTALL=
 TARGET_COVERAGE=
 TARGET_STATIC=
 TARGET_COVERITY=
-TARGET_BUILD="release"
+TARGET_VARIANT="release"
 
 # change defaults based on build parameter
 case "$1" in
     "install")
-	TARGET_INSTALL=${TARGET}
+	TARGET_INSTALL=${BUILD}
 	;;
 
     "coverage")
-	TARGET_COVERAGE=${TARGET}
-	TARGET_BUILD="debug"
+	TARGET_COVERAGE=${BUILD}
+	TARGET_VARIANT="debug"
 	# need to disable ccache on coverage builds
 	export CCACHE=
 	;;
 
     "static")
-	TARGET_STATIC=${TARGET}
-	TARGET_BUILD="debug"
+	TARGET_STATIC=${BUILD}
+	TARGET_VARIANT="debug"
 	# need to disable ccache on static builds
 	export CCACHE=
 	;;
 
     "coverity")
-	TARGET_COVERITY=${TARGET}
-	TARGET_BUILD="debug"
+	TARGET_COVERITY=${BUILD}
+	TARGET_VARIANT="debug"
 	# need to disable ccache on coverity builds
 	export CCACHE=
 	;;
 
     "test-install")
 	# Perfom test if being executed on native target
-	TARGET_TEST=${NATIVE_TARGET}
-	TARGET_INSTALL=${TARGET}
+	TARGET_TEST=${NATIVE_BUILD}
+	TARGET_INSTALL=${BUILD}
 	;;
 
     "")
 	# default is test only on Linux and install
 	# Currently most tests do not work on targets except for Linux
 	# TARGET_TEST=${NATIVE_TARGET}
-	TARGET_TEST="Linux"
-	TARGET_INSTALL=${TARGET}
+	TARGET_TEST="x86_64-linux-gnu"
+	TARGET_INSTALL=${BUILD}
 	;;
 
     *)
@@ -110,32 +110,17 @@ EOF
 	;;
 esac
 
-# currently core buildsystem doesnt use triplets so we need to adjust for that
-# here is also where we can adjust other setting based on target
-case ${TARGET} in
-    "m68k-atari-mint")
-	MAKE=make
-	TARGET_TARGET="atari"
-	;;
+# adjust settings based on build triplet 
+case ${BUILD} in
 
-    "m5475-atari-mint")
-	MAKE=make
-	TARGET_TARGET="m5475_atari"
-	;;
-
-    "powerpc-apple-darwin9")
-	MAKE=make
-	TARGET_TARGET="powerpc_apple_darwin9"
-	;;
-
-    "OpenBSD")
+    "amd64-unknown-openbsd*")
 	MAKE=gmake
-	TARGET_TARGET=${TARGET}
+	TARGET_TARGET=${BUILD}
 	;;    
 
     *)
 	MAKE=make
-	TARGET_TARGET=${TARGET}
+	TARGET_TARGET=${BUILD}
 	;;
 esac
 
@@ -151,24 +136,24 @@ export PATH=${PATH}:${PREFIX}/bin
 # execute the build steps
 
 # clean target is always first
-${MAKE} Q= clean TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
+${MAKE} Q= clean BUILD=${TARGET_TARGET} VARIANT=${TARGET_VARIANT}
 
 # build as per type requested
-if [ "x${TARGET}" = "x${TARGET_COVERAGE}" ]; then
+if [ "x${BUILD}" = "x${TARGET_COVERAGE}" ]; then
     # Coverage Build
-    ${MAKE} Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD} coverage
+    ${MAKE} Q= BUILD=${TARGET_TARGET} VARIANT=${TARGET_VARIANT} coverage
     gcovr -x -r .. -o coverage.xml
 
-elif [ "x${TARGET}" = "x${TARGET_STATIC}" ]; then
+elif [ "x${BUILD}" = "x${TARGET_STATIC}" ]; then
     # static build
     rm -rf clangScanBuildReports
 
-    scan-build -o clangScanBuildReports -v --use-cc clang --use-analyzer=/usr/bin/clang ${MAKE} BUILD=debug
+    scan-build -o clangScanBuildReports -v --use-cc clang --use-analyzer=/usr/bin/clang ${MAKE} VARIANT=${TARGET_VARIANT}
 
     # clean up after
-    ${MAKE} Q= clean TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
+    ${MAKE} Q= clean BUILD=${TARGET_TARGET} VARIANT=${TARGET_VARIANT}
 
-elif [ "x${TARGET}" = "x${TARGET_COVERITY}" ]; then
+elif [ "x${BUILD}" = "x${TARGET_COVERITY}" ]; then
     # coverity build
 
     # Check thses are set
@@ -187,13 +172,12 @@ elif [ "x${TARGET}" = "x${TARGET_COVERITY}" ]; then
     COVERITY_PREFIX=${COVERITY_PREFIX:-/opt/coverity/cov-analysis-linux64-6.6.1}
     COVERITY_VERSION=$(git rev-parse HEAD)
 
-
     export PATH=${PATH}:${COVERITY_PREFIX}/bin
 
     # cleanup before we start
     rm -rf cov-int/ coverity-scan.tar.gz coverity-scan.tar
 
-    cov-build --dir cov-int ${MAKE} Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
+    cov-build --dir cov-int ${MAKE} Q= BUILD=${TARGET_TARGET} VARIANT=${TARGET_VARIANT}
 
     tar cf coverity-scan.tar cov-int
 
@@ -203,16 +187,16 @@ elif [ "x${TARGET}" = "x${TARGET_COVERITY}" ]; then
 
 else
     # Normal build
-    ${MAKE} Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD}
+    ${MAKE} Q= BUILD=${TARGET_TARGET} VARIANT=${TARGET_VARIANT}
 
 fi
 
-# test if appropriate
-if [ "x${TARGET}" = "x${TARGET_TEST}" ]; then
-    ${MAKE} Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD} test
+# run tests if appropriate
+if [ "x${BUILD}" = "x${TARGET_TEST}" ]; then
+    ${MAKE} Q= BUILD=${TARGET_TARGET} VARIANT=${TARGET_VARIANT} test
 fi
 
-# install
-if [ "x${TARGET}" = "x${TARGET_INSTALL}" ]; then
-    ${MAKE} Q= TARGET=${TARGET_TARGET} BUILD=${TARGET_BUILD} install
+# install the output 
+if [ "x${BUILD}" = "x${TARGET_INSTALL}" ]; then
+    ${MAKE} Q= BUILD=${TARGET_TARGET} VARIANT=${TARGET_VARIANT} install
 fi
