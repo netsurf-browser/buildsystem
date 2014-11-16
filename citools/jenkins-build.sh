@@ -113,7 +113,7 @@ esac
 # adjust settings based on build triplet 
 case ${BUILD} in
 
-    "amd64-unknown-openbsd*")
+    amd64-unknown-openbsd*)
 	MAKE=gmake
 	TARGET_TARGET=${BUILD}
 	;;    
