@@ -72,9 +72,6 @@ ifeq ($(HOST),)
   endif
 endif
 
-# Make first-stab at identity of CC
-CC__ := $(CC)
-
 ifeq ($(HOST),$(BUILD))
   # Native build
 
@@ -103,6 +100,8 @@ ifeq ($(HOST),$(BUILD))
 else
   # Cross compiling
 
+  # Make first-stab at identity of CC
+  CC__ := $(CC)
   # Improve our guess at the identity of CC
   # (only if CC was not specified by the user)
   ifeq ($(origin CC),default)
