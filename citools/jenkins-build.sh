@@ -148,7 +148,7 @@ elif [ "x${BUILD}" = "x${TARGET_STATIC}" ]; then
     # static build
     rm -rf clangScanBuildReports
 
-    scan-build -o clangScanBuildReports -v --use-cc clang --use-analyzer=/usr/bin/clang ${MAKE} VARIANT=${TARGET_VARIANT}
+    scan-build -o clangScanBuildReports -v --use-cc clang --use-analyzer=/usr/bin/clang ${MAKE} Q= VARIANT=${TARGET_VARIANT}
 
     # clean up after
     ${MAKE} Q= clean BUILD=${TARGET_TARGET} VARIANT=${TARGET_VARIANT}
