@@ -12,7 +12,6 @@
 # 				lib-static	-	Static library
 # 				lib-shared	-	Shared library
 # 				riscos-module	-	RISC OS module
-# BUILD			Target platform identifier
 #
 # Optional inputs:
 #
@@ -22,8 +21,10 @@
 # 			information at the same time as compiling sources.
 # 			Set to "yes" if it can.
 # DESTDIR		Sandboxed FS root (e.g. for packaging)
+# BUILD			Target platform identifier, defaults to HOST
 # HOST			Host platform identifier
 # REQUIRED_PKGS		List of required pkg-config packages
+# REQUIRED_LIBS         List of required libraries to add to pkg-config
 #
 # The client may also override all toolchain settings, including:
 #
@@ -280,7 +281,9 @@ distclean: clean
 __comma := ,
 __empty := 
 __space := $(empty) $(empty)
+__dashl := $(empty) -l$(empty)
 __required = $(if $(REQUIRED_PKGS),Requires: $(subst $(__space),$(__comma) ,$(strip $(REQUIRED_PKGS))),)
+__libraries = $(if $(REQUIRED_LIBS),-l$(subst $(__space),$(__dashl),$(strip $(REQUIRED_LIBS))),)
 
 # Install a pkg-config control file ($1) to the specified location ($2)
 define install_pkgconfig
@@ -293,6 +296,7 @@ define install_pkgconfig
 		-e 's#PATCH#$(patch-version)#' \
 		-e 's#VERSION#$(COMPONENT_VERSION)#' \
 		-e 's#REQUIRED#$(__required)#' \
+		-e 's#LIBRARIES#$(__libraries)#' \
 		$1 >$(BUILDDIR)/$(1:.in=)
 	$(INSTALL) $(INSTALLFLAGS) -m 644 $(BUILDDIR)/$(1:.in=) \
 		$2/$(1:.in=)
