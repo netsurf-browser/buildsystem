@@ -38,7 +38,7 @@ endif
 
 # RISC OS module extensions
 ifeq ($(COMPONENT_TYPE),riscos-module)
-  ifneq ($(BUILD),arm-unknown-riscos)
+  ifneq ($(HOST),arm-unknown-riscos)
     $(error Attempting to build a RISC OS module for a non-RISC OS target)
   endif
 

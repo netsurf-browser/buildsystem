@@ -1,5 +1,7 @@
 #!/bin/bash
 #
+# NetSurf continuous integration build script for jenkins
+#
 # Copyright © 2013 Vincent Sanders <vince@netsurf-browser.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,8 +22,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-# NetSurf continuius integration build script for jenkins
-#
 # This script may be executed by jenkins jobs that use the core buildsystem
 #
 # Usage: jenkins-build.sh [install|test-install|coverage|static]
@@ -32,20 +32,24 @@
 # static - perform a static analysis
 # coverity - perform a coverity scan
 
-# BUILD must be in the environment and set correctly
-if [ "x${BUILD}" = "x" ];then
-    echo "BUILD unset"
+# HOST must be in the environment and set correctly
+if [ "x${HOST}" = "x" ];then
+    echo "HOST unset"
     exit 1
 fi
 
 # The target for built artifacts
 #
-# This does mean the artifacts of a target must all be built on the
-#   same jenkins slave instance
-ARTIFACT_HOME=${JENKINS_HOME}/artifacts-${BUILD}
+# This requires the artifacts of a target must all be built on the same
+#  jenkins slave instance.
+ARTIFACT_HOME=${JENKINS_HOME}/artifacts-${HOST}
 
-# Obtain the native target
-NATIVE_BUILD=$(cc -dumpmachine)
+# Obtain the native build triplet if unset
+if [ "x${BUILD}" = "x" ];then
+    # This assumes the cc on the PATH is the native one.
+    BUILD=$(cc -dumpmachine)
+fi
+
 
 # target defaults
 TARGET_TEST=
@@ -53,47 +57,48 @@ TARGET_INSTALL=
 TARGET_COVERAGE=
 TARGET_STATIC=
 TARGET_COVERITY=
-TARGET_VARIANT="release"
 
-# change defaults based on build parameter
+# Which variant is being generated
+VARIANT="release"
+
+# change target build according to parameter
 case "$1" in
     "install")
-	TARGET_INSTALL=${BUILD}
+	TARGET_INSTALL=${HOST}
 	;;
 
     "coverage")
-	TARGET_COVERAGE=${BUILD}
-	TARGET_VARIANT="debug"
+	TARGET_COVERAGE=${HOST}
+	VARIANT="debug"
 	# need to disable ccache on coverage builds
 	export CCACHE=
 	;;
 
     "static")
-	TARGET_STATIC=${BUILD}
-	TARGET_VARIANT="debug"
+	TARGET_STATIC=${HOST}
+	VARIANT="debug"
 	# need to disable ccache on static builds
 	export CCACHE=
 	;;
 
     "coverity")
-	TARGET_COVERITY=${BUILD}
-	TARGET_VARIANT="debug"
+	TARGET_COVERITY=${HOST}
+	VARIANT="debug"
 	# need to disable ccache on coverity builds
 	export CCACHE=
 	;;
 
     "test-install")
 	# Perfom test if being executed on native target
-	TARGET_TEST=${NATIVE_BUILD}
-	TARGET_INSTALL=${BUILD}
+	TARGET_TEST=${BUILD}
+	TARGET_INSTALL=${HOST}
 	;;
 
     "")
 	# default is test only on Linux and install
 	# Currently most tests do not work on targets except for Linux
-	# TARGET_TEST=${NATIVE_TARGET}
 	TARGET_TEST="x86_64-linux-gnu"
-	TARGET_INSTALL=${BUILD}
+	TARGET_INSTALL=${HOST}
 	;;
 
     *)
@@ -110,22 +115,27 @@ EOF
 	;;
 esac
 
-# adjust settings based on build triplet 
+
+# adjust tools based on build
 case ${BUILD} in
 
     amd64-unknown-openbsd*)
 	MAKE=gmake
-	TARGET_TARGET=${BUILD}
+	;;
+
+    x86_64-unknown-freebsd*)
+	MAKE=gmake
 	;;    
 
     *)
 	MAKE=make
-	TARGET_TARGET=${BUILD}
 	;;
 esac
 
+
 # Ensure the artifact target directory exists
 mkdir -p ${ARTIFACT_HOME}
+
 
 # Configure all build paths relative to prefix
 export PREFIX=${ARTIFACT_HOME}
@@ -133,27 +143,31 @@ export PKG_CONFIG_PATH=${PREFIX}/lib/pkgconfig
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${PREFIX}/lib
 export PATH=${PATH}:${PREFIX}/bin
 
+
 # execute the build steps
 
 # clean target is always first
-${MAKE} Q= clean BUILD=${TARGET_TARGET} VARIANT=${TARGET_VARIANT}
+${MAKE} Q= clean HOST=${HOST} VARIANT=${VARIANT}
+
 
 # build as per type requested
-if [ "x${BUILD}" = "x${TARGET_COVERAGE}" ]; then
+if [ "x${HOST}" = "x${TARGET_COVERAGE}" ]; then
     # Coverage Build
-    ${MAKE} Q= BUILD=${TARGET_TARGET} VARIANT=${TARGET_VARIANT} coverage
+    ${MAKE} Q= HOST=${HOST} VARIANT=${VARIANT} coverage
     gcovr -x -r .. -o coverage.xml
 
-elif [ "x${BUILD}" = "x${TARGET_STATIC}" ]; then
+
+elif [ "x${HOST}" = "x${TARGET_STATIC}" ]; then
     # static build
     rm -rf clangScanBuildReports
 
-    scan-build -o clangScanBuildReports -v --use-cc clang --use-analyzer=/usr/bin/clang ${MAKE} Q= VARIANT=${TARGET_VARIANT}
+    scan-build -o clangScanBuildReports -v --use-cc clang --use-analyzer=/usr/bin/clang ${MAKE} Q= VARIANT=${VARIANT}
 
     # clean up after
-    ${MAKE} Q= clean BUILD=${TARGET_TARGET} VARIANT=${TARGET_VARIANT}
+    ${MAKE} Q= clean HOST=${HOST} VARIANT=${VARIANT}
 
-elif [ "x${BUILD}" = "x${TARGET_COVERITY}" ]; then
+
+elif [ "x${HOST}" = "x${TARGET_COVERITY}" ]; then
     # coverity build
 
     # Check thses are set
@@ -177,7 +191,7 @@ elif [ "x${BUILD}" = "x${TARGET_COVERITY}" ]; then
     # cleanup before we start
     rm -rf cov-int/ coverity-scan.tar.gz coverity-scan.tar
 
-    cov-build --dir cov-int ${MAKE} Q= BUILD=${TARGET_TARGET} VARIANT=${TARGET_VARIANT}
+    cov-build --dir cov-int ${MAKE} Q= HOST=${HOST} VARIANT=${VARIANT}
 
     tar cf coverity-scan.tar cov-int
 
@@ -185,18 +199,22 @@ elif [ "x${BUILD}" = "x${TARGET_COVERITY}" ]; then
 
     curl --form "project=${COVERITY_PROJECT}" --form "token=${COVERITY_TOKEN}" --form "email=${COVERITY_USER}" --form "file=@coverity-scan.tar.gz" --form "version=${COVERITY_VERSION}" --form "description=Git Head build" http://scan5.coverity.com/cgi-bin/upload.py
 
+
 else
     # Normal build
-    ${MAKE} Q= BUILD=${TARGET_TARGET} VARIANT=${TARGET_VARIANT}
+    ${MAKE} Q= HOST=${HOST} VARIANT=${VARIANT}
+
 
 fi
+
 
 # run tests if appropriate
-if [ "x${BUILD}" = "x${TARGET_TEST}" ]; then
-    ${MAKE} Q= BUILD=${TARGET_TARGET} VARIANT=${TARGET_VARIANT} test
+if [ "x${HOST}" = "x${TARGET_TEST}" ]; then
+    ${MAKE} Q= HOST=${HOST} VARIANT=${VARIANT} test
 fi
 
+
 # install the output 
-if [ "x${BUILD}" = "x${TARGET_INSTALL}" ]; then
-    ${MAKE} Q= BUILD=${TARGET_TARGET} VARIANT=${TARGET_VARIANT} install
+if [ "x${HOST}" = "x${TARGET_INSTALL}" ]; then
+    ${MAKE} Q= HOST=${HOST} VARIANT=${VARIANT} install
 fi

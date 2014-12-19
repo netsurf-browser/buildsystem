@@ -10,8 +10,8 @@
 #
 # Optional inputs:
 #
-# HOST			Platform we're building on
-# BUILD			Target platform (defaults to host)
+# BUILD			Platform we're building on
+# HOST			Target platform (defaults to build)
 # VARIANT		Type of build to perform:
 # 				release		-	Release build (default)
 # 				debug		-	Debug build
@@ -41,6 +41,10 @@ endif
 # Determine path used to load us, so we can locate other makefiles etc
 ###############################################################################
 
+# The directory in which the build system can be found
+#
+# TODO: This should be NS_BUILDSYSTEM_DIR or similar and is not connected
+#       to the BUILD variable.
 NSBUILD := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 NSSHARED := $(patsubst %/,%,$(dir $(NSBUILD)))
 NSTESTTOOLS := $(NSSHARED)/testtools
@@ -49,33 +53,33 @@ NSTESTTOOLS := $(NSSHARED)/testtools
 # Bootstrap default tooling
 ###############################################################################
 
-HOST_CC ?= cc
+BUILD_CC ?= cc
 
 ###############################################################################
 # Host/build platform detection
 ###############################################################################
 
-# Autodetect build
-ifeq ($(BUILD),)
-  BUILD := $(shell $(CC) -dumpmachine)
-  ifeq ($(BUILD),)
-    $(error "Failed to guess BUILD")
+# Autodetect host
+ifeq ($(HOST),)
+  HOST := $(shell $(CC) -dumpmachine)
+  ifeq ($(HOST),)
+    $(error "Failed to guess HOST")
   endif
 else
 endif
 
-# Autodetect host if necessary
-ifeq ($(HOST),)
-  HOST := $(shell $(HOST_CC) -dumpmachine)
-  ifeq ($(HOST),)
-    $(error "Failed to guess HOST")
+# Autodetect build if necessary
+ifeq ($(BUILD),)
+  BUILD := $(shell $(BUILD_CC) -dumpmachine)
+  ifeq ($(BUILD),)
+    $(error "Failed to guess BUILD")
   endif
 endif
 
-ifeq ($(HOST),$(BUILD))
+ifeq ($(BUILD),$(HOST))
   # Native build
 
-  ifeq ($(BUILD),i586-pc-haiku)
+  ifeq ($(HOST),i586-pc-haiku)
     # Building on+for Haiku
 
     # Default prefix
@@ -89,7 +93,7 @@ ifeq ($(HOST),$(BUILD))
     PREFIX ?= $(BEOS_INSTALL_ENV)
   endif
 
-  ifeq ($(findstring openbsd,$(BUILD)),openbsd)
+  ifeq ($(findstring openbsd,$(HOST)),openbsd)
     # Building on+for OpenBSD
     CFLAGS := $(CFLAGS) -I$(GCCSDK_INSTALL_ENV)/include -I/usr/local/include
     CXXFLAGS := $(CXXFLAGS) -I$(GCCSDK_INSTALL_ENV)/include -I/usr/local/include
@@ -105,16 +109,16 @@ else
   # Improve our guess at the identity of CC
   # (only if CC was not specified by the user)
   ifeq ($(origin CC),default)
-    CC__ := $(BUILD)-gcc
+    CC__ := $(HOST)-gcc
   endif
 
   # Search the path for the compiler
   toolpath_ := $(shell /bin/which $(CC__))
   ifeq ($(toolpath_),)
-    toolpath_ := /opt/netsurf/$(BUILD)/cross/bin/
-    CC__  := $(toolpath_)$(BUILD)-gcc
-    AR__  := $(toolpath_)$(BUILD)-ar
-    CXX__ := $(toolpath_)$(BUILD)-g++
+    toolpath_ := /opt/netsurf/$(HOST)/cross/bin/
+    CC__  := $(toolpath_)$(HOST)-gcc
+    AR__  := $(toolpath_)$(HOST)-ar
+    CXX__ := $(toolpath_)$(HOST)-g++
   else
     CC__ := $(realpath $(toolpath_))
     toolpath_ := $(dir $(CC__))
@@ -132,7 +136,7 @@ else
     GCCSDK_INSTALL_ENV := $(realpath $(toolpath_)../../env)
   endif
 
-  ifeq ($(BUILD),arm-unknown-riscos)
+  ifeq ($(HOST),arm-unknown-riscos)
     # Cross compiling for RISC OS
     CMHG ?= PATH="$(GCCSDK_INSTALL_CROSSBIN):$(PATH)" $(GCCSDK_INSTALL_CROSSBIN)/cmunge
     GENHTML ?= echo
@@ -160,7 +164,7 @@ else
     PREFIX ?= $(GCCSDK_INSTALL_ENV)
   endif
 
-  ifeq ($(BUILD),i686-w64-mingw32)
+  ifeq ($(HOST),i686-w64-mingw32)
     # Cross compiling for Windows -- assumes mingw toolchain
     GENHTML ?= echo
     LCOV ?= echo
@@ -176,7 +180,7 @@ else
   endif
 
   # AmigaOS (3/4; m68k/ppc: we can treat them identically)
-  ifeq ($(findstring amigaos,$(BUILD)),amigaos)
+  ifeq ($(findstring amigaos,$(HOST)),amigaos)
     # Cross compiling for AmigaOS
     PKGCONFIG ?= PKG_CONFIG_LIBDIR="$(PREFIX)/lib/pkgconfig:$(GCCSDK_INSTALL_ENV)/lib/pkgconfig:$(GCCSDK_INSTALL_ENV)/share/pkgconfig" pkg-config
 
@@ -188,7 +192,7 @@ else
     PREFIX ?= $(GCCSDK_INSTALL_ENV)
   endif
 
-  ifeq ($(BUILD),m68k-atari-mint)
+  ifeq ($(HOST),m68k-atari-mint)
     # Cross compiling for FreeMiNT
 
     ATARIARCH ?= 68020-60
@@ -213,7 +217,7 @@ else
     PREFIX ?= $(GCCSDK_INSTALL_ENV)
   endif
 
-  ifeq ($(BUILD),m5475-atari-mint)
+  ifeq ($(HOST),m5475-atari-mint)
     # Cross compiling for FreeMiNT (m5475)
     CFLAGS := $(CFLAGS) -U__STRICT_ANSI__ -I$(GCCSDK_INSTALL_ENV)/include $(ARCHFLAGS)
     CXXFLAGS := $(CXXFLAGS) -U__STRICT_ANSI__ -I$(GCCSDK_INSTALL_ENV)/include $(ARCHFLAGS)
@@ -241,7 +245,7 @@ ECHO ?= echo
 
 GENHTML ?= genhtml
 
-HOST_CXX ?= c++
+BUILD_CXX ?= c++
 
 INSTALL ?= install
 
@@ -335,7 +339,7 @@ else
   ccvsn := $(shell $(CC) --version 2>&1)
   ifeq ($(ccvsn),)
     # Version string is blank
-    ifeq ($(HOST),arm-unknown-riscos)
+    ifeq ($(BUILD),arm-unknown-riscos)
       # For some reason we never see the output of SCL apps, so might be
       # Norcroft.  However it might also be a GCC linked against a buggy
       # UnixLib.

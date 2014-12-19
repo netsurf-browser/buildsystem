@@ -15,14 +15,15 @@
 #
 # Optional inputs:
 #
-# BUILDDIR		Directory to build into (defaults to 
-# 			build-$(HOST)-$(BUILD)-$(VARIANT)-$(COMPONENT_TYPE))
+# BUILD			Build platform identifier
+# HOST			Target host platform identifier, defaults to BUILD
+# BUILDDIR		Directory to place built output into (defaults to
+# 			build-$(BUILD)-$(HOST)-$(VARIANT)-$(COMPONENT_TYPE))
+#                       This is not related to the BUILD platform identifier
 # CC_CAN_BUILD_AND_DEP	Flag whether $(CC) is capable of calculating dependency
 # 			information at the same time as compiling sources.
 # 			Set to "yes" if it can.
 # DESTDIR		Sandboxed FS root (e.g. for packaging)
-# BUILD			Target platform identifier, defaults to HOST
-# HOST			Host platform identifier
 # REQUIRED_PKGS		List of required pkg-config packages
 # REQUIRED_LIBS         List of required libraries to add to pkg-config
 #
@@ -81,8 +82,8 @@ ifeq ($(COMPONENT_TYPE),)
 endif
 
 # Target platform must be defined by the client
-ifeq ($(BUILD),)
-  $(error BUILD not defined)
+ifeq ($(HOST),)
+  $(error HOST not defined)
 endif
 
 # Build variant, too
@@ -110,7 +111,7 @@ patch-version := $(word 3,$(subst ., ,$(COMPONENT_VERSION)))
 ##############################################################################
 
 # Build directory
-BUILDDIR ?= build-$(HOST)-$(BUILD)-$(VARIANT)-$(COMPONENT_TYPE)
+BUILDDIR ?= build-$(BUILD)-$(HOST)-$(VARIANT)-$(COMPONENT_TYPE)
 
 # Build tree subdirs
 COVERAGEDIR := $(BUILDDIR)/coverage
