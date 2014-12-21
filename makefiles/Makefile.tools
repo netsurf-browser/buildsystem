@@ -101,6 +101,14 @@ ifeq ($(BUILD),$(HOST))
 
     FLEX ?= gflex
   endif
+
+  ifeq ($(findstring freebsd,$(HOST)),freebsd)
+    # Building on+for FreeBSD
+    CFLAGS := $(CFLAGS) -I$(GCCSDK_INSTALL_ENV)/include -I/usr/local/include
+    CXXFLAGS := $(CXXFLAGS) -I$(GCCSDK_INSTALL_ENV)/include -I/usr/local/include
+    LDFLAGS := $(LDFLAGS) -L$(GCCSDK_INSTALL_ENV)/lib -L/usr/local/lib
+  endif
+
 else
   # Cross compiling
 
