@@ -154,7 +154,7 @@ ${MAKE} Q= clean HOST=${HOST} VARIANT=${VARIANT}
 if [ "x${HOST}" = "x${TARGET_COVERAGE}" ]; then
     # Coverage Build
     ${MAKE} Q= HOST=${HOST} VARIANT=${VARIANT} coverage
-    gcovr -x -r .. -o coverage.xml
+    gcovr -x -r ${WORKSPACE} -o coverage.xml
 
 
 elif [ "x${HOST}" = "x${TARGET_STATIC}" ]; then
