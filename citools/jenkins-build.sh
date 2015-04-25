@@ -161,7 +161,8 @@ elif [ "x${HOST}" = "x${TARGET_STATIC}" ]; then
     # static build
     rm -rf clangScanBuildReports
 
-    scan-build -o clangScanBuildReports -v --use-cc clang --use-analyzer=/usr/bin/clang ${MAKE} Q= VARIANT=${VARIANT}
+    # build with static analysis without warnings causing errors
+    CFLAGS=-Wno-error scan-build -o clangScanBuildReports -v -v --use-cc clang --use-analyzer=/usr/bin/clang ${MAKE} Q= VARIANT=${VARIANT}
 
     # clean up after
     ${MAKE} Q= clean HOST=${HOST} VARIANT=${VARIANT}
