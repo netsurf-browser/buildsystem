@@ -153,7 +153,7 @@ ${MAKE} Q= clean HOST=${HOST} VARIANT=${VARIANT}
 # build as per type requested
 if [ "x${HOST}" = "x${TARGET_COVERAGE}" ]; then
     # Coverage Build
-    ${MAKE} Q= HOST=${HOST} VARIANT=${VARIANT} coverage
+    CFLAGS=-Wno-error ${MAKE} Q= HOST=${HOST} VARIANT=${VARIANT} coverage
     gcovr -x -r build-${BUILD}-${HOST}-${VARIANT}-lib-static -o coverage.xml
 
 
