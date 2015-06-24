@@ -24,13 +24,14 @@
 
 # This script may be executed by jenkins jobs that use the core buildsystem
 #
-# Usage: jenkins-build.sh [install|test-install|coverage|static]
+# Usage: jenkins-build.sh [install|test-install|coverage|static|docs]
 #
 # install - build and install
 # test-install - build, test and install
 # coverage - run coverage
 # static - perform a static analysis
 # coverity - perform a coverity scan
+# docs - build doxygen docs
 
 # HOST must be in the environment and set correctly
 if [ "x${HOST}" = "x" ];then
@@ -57,6 +58,7 @@ TARGET_INSTALL=
 TARGET_COVERAGE=
 TARGET_STATIC=
 TARGET_COVERITY=
+TARGET_DOCS=
 
 # Which variant is being generated
 VARIANT="release"
@@ -94,6 +96,10 @@ case "$1" in
 	TARGET_INSTALL=${HOST}
 	;;
 
+    "docs")
+	TARGET_DOCS=${HOST}
+	;;
+
     "")
 	# default is test only on Linux and install
 	# Currently most tests do not work on targets except for Linux
@@ -103,13 +109,14 @@ case "$1" in
 
     *)
 	cat <<EOF
-Usage: jenkins-build.sh [install|test-install|coverage|static]
+Usage: jenkins-build.sh [install|test-install|coverage|static|docs]
 
        install        build and install
        test-install   build, test and install
        coverage       run coverage
        static         perform a static anaysis
        coverity       perform a coverity scan
+       docs           generate doxygen docs
 EOF
 	exit 1
 	;;
@@ -199,6 +206,11 @@ elif [ "x${HOST}" = "x${TARGET_COVERITY}" ]; then
     gzip -9 coverity-scan.tar
 
     curl --form "project=${COVERITY_PROJECT}" --form "token=${COVERITY_TOKEN}" --form "email=${COVERITY_USER}" --form "file=@coverity-scan.tar.gz" --form "version=${COVERITY_VERSION}" --form "description=Git Head build" http://scan5.coverity.com/cgi-bin/upload.py
+
+
+elif [ "x${HOST}" = "x${TARGET_DOCS}" ]; then
+    # Documentation build
+    ${MAKE} Q= HOST=${HOST} VARIANT=${VARIANT} docs
 
 
 else

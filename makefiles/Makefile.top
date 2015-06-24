@@ -115,7 +115,6 @@ BUILDDIR ?= build-$(BUILD)-$(HOST)-$(VARIANT)-$(COMPONENT_TYPE)
 
 # Build tree subdirs
 COVERAGEDIR := $(BUILDDIR)/coverage
-DOCDIR := $(BUILDDIR)/docs
 
 # Determine if we want to build testcases
 ifeq ($(MAKECMDGOALS),test)
@@ -236,8 +235,8 @@ coverage: __precov test
 profile: __partial_clean test
 
 # Compile documentation
-docs: $(BUILDDIR)/stamp
-	$(Q)$(DOXYGEN) build/Doxyfile
+docs: $(DOXYCONF) $(BUILDDIR)/stamp
+	$(Q)$(DOXYGEN) $<
 
 # Distribution
 # This constructs a distribution tar from the last git tag. It ensures
@@ -393,7 +392,6 @@ uninstall:
 $(BUILDDIR)/stamp:
 	$(Q)$(MKDIR) $(MKDIRFLAGS) $(BUILDDIR)
 	$(Q)$(MKDIR) $(MKDIRFLAGS) $(COVERAGEDIR)
-	$(Q)$(MKDIR) $(MKDIRFLAGS) $(DOCDIR)
 	$(Q)$(TOUCH) $(TOUCHFLAGS) $(BUILDDIR)/stamp
 
 $(OUTPUT): $(BUILDDIR)/stamp $(OBJECTS)
