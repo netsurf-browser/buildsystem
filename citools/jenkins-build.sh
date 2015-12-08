@@ -205,7 +205,7 @@ elif [ "x${HOST}" = "x${TARGET_COVERITY}" ]; then
 
     gzip -9 coverity-scan.tar
 
-    curl --form "project=${COVERITY_PROJECT}" --form "token=${COVERITY_TOKEN}" --form "email=${COVERITY_USER}" --form "file=@coverity-scan.tar.gz" --form "version=${COVERITY_VERSION}" --form "description=Git Head build" "http://scan.coverity.com/builds?project=${COVERITY_PROJECT}"
+    curl --form "project=${COVERITY_PROJECT}" --form "token=${COVERITY_TOKEN}" --form "email=${COVERITY_USER}" --form "file=@coverity-scan.tar.gz" --form "version=${COVERITY_VERSION}" --form "description=Git Head build" "https://scan.coverity.com/builds?project=${COVERITY_PROJECT}"
 
 
 elif [ "x${HOST}" = "x${TARGET_DOCS}" ]; then
