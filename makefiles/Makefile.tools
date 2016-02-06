@@ -379,6 +379,10 @@ else
     # (ie, Debian, Apple, etc)
     toolchain := clang
   endif
+  ifeq ($(word 2,$(ccvsn)),LLVM)
+    # Apple version is "Apple LLVM" to be differntly awkward
+    toolchain := clang
+  endif
   ifeq ($(word 1,$(ccvsn)),Open64)
     toolchain := open64
   endif
