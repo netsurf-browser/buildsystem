@@ -111,6 +111,13 @@ ifeq ($(BUILD),$(HOST))
     LDFLAGS := $(LDFLAGS) -L$(GCCSDK_INSTALL_ENV)/lib -L/usr/local/lib
   endif
 
+  ifeq ($(findstring arwin,$(HOST)),arwin)
+    # Building on+for Mac OS X (Darwin) with MAC ports
+    CFLAGS := $(CFLAGS) -I/opt/local/include
+    CXXFLAGS := $(CXXFLAGS) -I/opt/local/include
+    LDFLAGS := $(LDFLAGS) -L/opt/local/lib
+  endif
+
 else
   # Cross compiling
 
