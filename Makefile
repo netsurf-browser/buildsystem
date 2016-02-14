@@ -2,11 +2,11 @@
 #
 # Makefile for NetSurf buildsystem
 #
-# Copyright 2009-1013 John-Mark Bell <jmb@netsurf-browser.org>
+# Copyright 2009-2015 John-Mark Bell <jmb@netsurf-browser.org>
 
 # Component settings
 COMPONENT := buildsystem
-COMPONENT_VERSION := 1.4
+COMPONENT_VERSION := 1.5
 
 .PHONY:all usage install dist clean distclean test
 
