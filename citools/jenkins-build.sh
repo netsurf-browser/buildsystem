@@ -166,7 +166,7 @@ ${MAKE} Q= clean HOST=${HOST} VARIANT=${VARIANT}
 if [ "x${HOST}" = "x${TARGET_COVERAGE}" ]; then
     # Coverage Build
     CFLAGS=-Wno-error ${MAKE} Q= HOST=${HOST} VARIANT=${VARIANT} coverage
-    gcovr -v -x -r build-${BUILD}-${HOST}-${VARIANT}-lib-static -e '.*test/.*' -o coverage.xml
+    gcovr -v -x -e 'test/.*' -r . -o coverage.xml
 
 elif [ "x${HOST}" = "x${TARGET_STATIC}" ]; then
     # static build
