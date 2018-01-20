@@ -86,7 +86,7 @@ while (my $line = <TINDEX>) {
 			# Run testcase
 			run_test("$builddir/$test", 
 					"$directory/data/$data/$dtest");
-                }
+		}
 
 		close(DINDEX);
 	} else {
@@ -148,6 +148,8 @@ sub run_test
 				# EOF, so remove handle
 				$selector->remove($fh);
 				next;
+			} elsif ($len == 1 && $input eq "\n") {
+				# Skip bare new line.
 			} else {
 				# Split into lines
 				my @lines = split('\n', $input);
