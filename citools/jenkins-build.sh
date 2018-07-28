@@ -32,6 +32,7 @@
 # static - perform a static analysis
 # coverity - perform a coverity scan
 # docs - build doxygen docs
+# sanitize - Run the test suite under ASAN and UBSAN
 
 # HOST must be in the environment and set correctly
 if [ "x${HOST}" = "x" ];then
@@ -100,6 +101,11 @@ case "$1" in
 	TARGET_DOCS=${HOST}
 	;;
 
+    "sanitize")
+	TARGET_SANITIZE=${HOST}
+	VARIANT="debug"
+	;;
+
     "")
 	# default is test only on Linux and install
 	# Currently most tests do not work on targets except for Linux
@@ -109,7 +115,7 @@ case "$1" in
 
     *)
 	cat <<EOF
-Usage: jenkins-build.sh [install|test-install|coverage|static|docs]
+Usage: jenkins-build.sh [install|test-install|coverage|static|docs|sanitize]
 
        install        build and install
        test-install   build, test and install
@@ -117,6 +123,7 @@ Usage: jenkins-build.sh [install|test-install|coverage|static|docs]
        static         perform a static anaysis
        coverity       perform a coverity scan
        docs           generate doxygen docs
+       sanitize       run the tests under ASAN/UBSAN
 EOF
 	exit 1
 	;;
@@ -216,6 +223,9 @@ elif [ "x${HOST}" = "x${TARGET_DOCS}" ]; then
     # Documentation build
     ${MAKE} Q= HOST=${HOST} VARIANT=${VARIANT} docs
 
+elif [ "x${HOST}" = "x${TARGET_SANITIZE}" ]; then
+    # Sanitize build
+    ${NAME} Q= HOST=${HOST} VARIANT=${VARIANT} sanitize
 
 else
     # Normal build
