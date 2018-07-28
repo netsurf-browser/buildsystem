@@ -399,6 +399,25 @@ ifeq ($(toolchain),)
   $(error Unable to detect toolchain)
 endif
 
+# Detect if the toolchain ought to support sanitizers
+SANITIZE_OK=no
+ifeq ($(toolchain),gcc)
+  GCC_VERSION := $(shell $(CC) -dumpversion)
+  GCC_MAJOR := $(word 1,$(subst ., ,$(GCC_VERSION)))
+  ifeq ($(shell expr $(GCC_MAJOR) \>= 6),1)
+    SANITIZE_OK=yes
+  endif
+else ifeq ($(toolchain),clang)
+  SANITIZE_OK=yes
+endif
+
+# And fail if we can't sanitize and yet the user asked for it
+ifeq ($(MAKECMDGOALS),sanitize)
+  ifeq ($(SANITIZE_OK),no)
+    $(error Unable to build with sanitizers enabled, compiler not compatible
+  endif
+endif
+
 # TODO: It would be nice to avoid this hard-coded path
 include $(NSBUILD)/Makefile.$(toolchain)
 

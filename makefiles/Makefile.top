@@ -48,6 +48,7 @@
 # test			Build and run test suite, using current settings.
 # coverage		Determine test suite coverage (requires lcov)
 # profile		Build with profiling support enabled (requires gprof)
+# sanitize              Build and run test suite, using ASAN and UBSAN
 # docs			Produce documentation (requires doxygen)
 # dist                  Produce release tarball from latest git tag
 # clean			Clean the build
@@ -122,6 +123,8 @@ ifeq ($(MAKECMDGOALS),test)
 else ifeq ($(MAKECMDGOALS),profile)
   WANT_TEST := yes
 else ifeq ($(MAKECMDGOALS),coverage)
+  WANT_TEST := yes
+else ifeq ($(MAKECMDGOALS),sanitize)
   WANT_TEST := yes
 else
   WANT_TEST := no
@@ -230,6 +233,9 @@ coverage: __precov test
 	$(Q)$(RM) $(RMFLAGS) $(COVERAGEDIR)/$(COMPONENT)_tmp.info
 	$(Q)$(GENHTML) -o $(COVERAGEDIR) --num-spaces 2 \
 		$(COVERAGEDIR)/$(COMPONENT).info
+
+# Build and test sanitizers
+sanitize: test
 
 # Build for profiling
 profile: __partial_clean test

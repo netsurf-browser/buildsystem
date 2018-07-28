@@ -49,6 +49,17 @@ ifeq ($(MAKECMDGOALS),profile)
   LDFLAGS := $(LDFLAGS) $(PROFLDFLAGS)
 endif
 
+# Extensions for sanitize target
+ifeq ($(MAKECMDGOALS),sanitize)
+  SANCFLAGS ?= -fsanitize=address -fsanitize=undefined -fno-sanitize-recover
+  SANCXXFLAGS ?= -fsanitize=address -fsanitize=undefined -fno-sanitize-recover
+  SANLDFLAGS ?= -fsanitize=address -fsanitize=undefined -fno-sanitize-recover
+
+  CFLAGS := $(CFLAGS) $(SANCFLAGS)
+  CXXFLAGS := $(CXXFLAGS) $(SANCXXFLAGS)
+  LDFLAGS := $(LDFLAGS) $(SANLDFLAGS)
+endif
+
 # RISC OS module extensions
 ifeq ($(COMPONENT_TYPE),riscos-module)
   ifneq ($(HOST),arm-unknown-riscos)
