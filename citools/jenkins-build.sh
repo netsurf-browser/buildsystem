@@ -225,7 +225,7 @@ elif [ "x${HOST}" = "x${TARGET_DOCS}" ]; then
 
 elif [ "x${HOST}" = "x${TARGET_SANITIZE}" ]; then
     # Sanitize build
-    ${NAME} Q= HOST=${HOST} VARIANT=${VARIANT} sanitize
+    env UBSAN_OPTIONS=print_stacktrace=1 ${MAKE} Q= HOST=${HOST} VARIANT=${VARIANT} sanitize
 
 else
     # Normal build
