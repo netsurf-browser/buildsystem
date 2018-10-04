@@ -402,7 +402,7 @@ endif
 # Detect if the toolchain ought to support sanitizers
 SANITIZE_OK=no
 ifeq ($(toolchain),gcc)
-  GCC_VERSION := $(shell $(CC) -dumpversion)
+  GCC_VERSION := $(shell $(CC) -dumpversion -dumpfullversion)
   GCC_MAJOR := $(word 1,$(subst ., ,$(GCC_VERSION)))
   ifeq ($(shell expr $(GCC_MAJOR) \>= 6),1)
     SANITIZE_OK=yes

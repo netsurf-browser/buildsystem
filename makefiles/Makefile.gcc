@@ -93,7 +93,7 @@ endif
 ###############################################################################
 
 # Determine if the compiler supports simultaneous build & dep.
-ccvsn := $(shell $(CC) -dumpversion)
+ccvsn := $(shell $(CC) -dumpversion -dumpfullversion)
 # ccvsn = x.y.z
 GCCVER := $(word 1,$(subst ., ,$(ccvsn)))
 # GCCVER = x
