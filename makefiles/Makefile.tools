@@ -206,6 +206,10 @@ else
     CXXFLAGS := $(CXXFLAGS) -U__STRICT_ANSI__ -I$(GCCSDK_INSTALL_ENV)/include
     LDFLAGS := $(LDFLAGS) -L$(GCCSDK_INSTALL_ENV)/lib
 
+    ifeq ($(HOST),m68k-unknown-amigaos)
+        CFLAGS += -fomit-frame-pointer -m68020
+    endif
+
     PREFIX ?= $(GCCSDK_INSTALL_ENV)
   endif
 
