@@ -137,6 +137,10 @@ case ${BUILD} in
 	MAKE=gmake
 	;;
 
+    x86_64-unknown-openbsd*)
+	MAKE=gmake
+	;;
+
     x86_64-unknown-freebsd*)
 	MAKE=gmake
 	;;    
