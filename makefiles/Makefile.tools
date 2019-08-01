@@ -373,6 +373,11 @@ else
     endif
   endif
 
+  ifeq ($(findstring lcc:,$(ccvsn)),lcc:)
+    # MCST LCC pretends to be gcc
+    toolchain := gcc
+  endif
+
   # "Norcroft ..."
   ifeq ($(word 1,$(ccvsn)),Norcroft)
     toolchain := norcroft
