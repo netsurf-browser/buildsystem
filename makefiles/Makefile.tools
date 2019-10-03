@@ -139,7 +139,7 @@ else
   else
     CC__ := $(realpath $(toolpath_))
     toolpath_ := $(dir $(CC__))
-    toolprefix_ := $(subst :,/,$(dir $(subst -,/,$(subst /,:,$(CC__)))))
+    toolprefix_ := $(subst :,/,$(subst /,-,$(patsubst %/,%,$(dir $(subst -,/,$(subst /,:,$(CC__)))))))
     ifeq ($(origin AR),default)
       AR__ := $(toolprefix_)-ar
     endif
