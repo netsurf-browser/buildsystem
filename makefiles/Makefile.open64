@@ -27,7 +27,7 @@ LDFLAGS := $(LDFLAGS) -ipa
 ARFLG := cru
 
 # Definitions for various attributes
-CFLAGS := $(CFLAGS) -D_ALIGNED="__attribute__((aligned))"
+CFLAGS := $(CFLAGS) -D_ALIGNED="__attribute__((aligned))" -DSTMTEXPR=1
 
 # Extensions for coverage target
 ifeq ($(MAKECMDGOALS),coverage)
