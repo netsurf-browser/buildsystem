@@ -6,7 +6,7 @@
 
 # Component settings
 COMPONENT := buildsystem
-COMPONENT_VERSION := 1.8
+COMPONENT_VERSION := 1.9
 
 .PHONY:all usage install dist clean distclean test
 
