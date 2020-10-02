@@ -276,7 +276,7 @@ GENHTML ?= genhtml
 
 BUILD_CXX ?= c++
 
-INSTALL ?= install
+INSTALL ?= install -C
 
 LCOV ?= lcov
 
