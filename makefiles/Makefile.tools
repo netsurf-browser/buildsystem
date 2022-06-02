@@ -158,18 +158,25 @@ else
     GCCSDK_INSTALL_ENV := $(realpath $(toolpath_)../../env)
   endif
 
-  ifeq ($(HOST),arm-unknown-riscos)
+  ifeq ($(findstring -riscos,$(HOST)),-riscos)
     # Cross compiling for RISC OS
-    CMHG ?= PATH="$(GCCSDK_INSTALL_CROSSBIN):$(PATH)" $(GCCSDK_INSTALL_CROSSBIN)/cmunge
+    ifeq ($(HOST),arm-riscos-gnueabihf)
+      # Can't build modules with this toolchain
+      CMHG ?= echo
+    else
+      CMHG ?= PATH="$(GCCSDK_INSTALL_CROSSBIN):$(PATH)" $(GCCSDK_INSTALL_CROSSBIN)/cmunge
+    endif
     GENHTML ?= echo
     LCOV ?= echo
     PKGCONFIG ?= PKG_CONFIG_LIBDIR="$(PREFIX)/lib/pkgconfig:$(GCCSDK_INSTALL_ENV)/lib/pkgconfig:$(GCCSDK_INSTALL_ENV)/share/pkgconfig" pkg-config
 
     ifneq ($(COMPONENT_TYPE),riscos-module)
+      EXEEXT := ,ff8
       ifneq ($(findstring arm-unknown-riscos-gcc,$(CC__)),)
         EXEEXT := ,e1f
-      else
-        EXEEXT := ,ff8
+      endif
+      ifneq ($(findstring arm-riscos-gnueabihf-gcc,$(CC__)),)
+        EXEEXT := ,e1f
       endif
     else
       EXEEXT := ,ffa
