@@ -160,8 +160,8 @@ else
 
   ifeq ($(findstring -riscos,$(HOST)),-riscos)
     # Cross compiling for RISC OS
-    ifeq ($(HOST),arm-riscos-gnueabihf)
-      # Can't build modules with this toolchain
+    ifeq ($(findstring gnueabi,$(HOST)),gnueabi)
+      # Can't build modules with this [arm-riscos-gnueabi(hf)] toolchain
       CMHG ?= echo
     else
       CMHG ?= PATH="$(GCCSDK_INSTALL_CROSSBIN):$(PATH)" $(GCCSDK_INSTALL_CROSSBIN)/cmunge
@@ -173,6 +173,9 @@ else
     ifneq ($(COMPONENT_TYPE),riscos-module)
       EXEEXT := ,ff8
       ifneq ($(findstring arm-unknown-riscos-gcc,$(CC__)),)
+        EXEEXT := ,e1f
+      endif
+      ifneq ($(findstring arm-riscos-gnueabi-gcc,$(CC__)),)
         EXEEXT := ,e1f
       endif
       ifneq ($(findstring arm-riscos-gnueabihf-gcc,$(CC__)),)
