@@ -478,7 +478,11 @@ LDFLAGS := $(LDFLAGS) $(OPTLDFLAGS)
 ifeq ($(COMPONENT_TYPE),lib-static)
   LIBEXT ?= .a
 else
-  LIBEXT ?= .so
+  ifeq ($(findstring darwin,$(HOST)),darwin)
+    LIBEXT ?= .dylib
+  else
+    LIBEXT ?= .so
+  endif
 endif
 
 # If we're building a shared library, modify the flags appropriately

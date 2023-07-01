@@ -20,7 +20,11 @@ CXXSHR := -fPIC
 
 LDDBG := -g
 # Reevaluation is required here
-LDSHR = -shared -Wl,-soname,$(SONAME)
+ifeq ($(findstring darwin,$(HOST)),darwin)
+	LDSHR = -dynamiclib -install_name $(SONAME)
+else
+	LDSHR = -shared -Wl,-soname,$(SONAME)
+endif
 
 ARFLG := cru
 

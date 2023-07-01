@@ -189,9 +189,17 @@ endif
 # Determine the output filename
 ifeq ($(findstring lib,$(COMPONENT_TYPE)),lib)
   ifeq ($(findstring lib-shared,$(COMPONENT_TYPE)),lib-shared)
-    SHAREDLIBNAME := lib$(COMPONENT)$(LIBEXT)
-    SONAME := $(SHAREDLIBNAME).$(major-version)
-    OUTPUT := $(BUILDDIR)/$(SHAREDLIBNAME).$(COMPONENT_VERSION)
+    ifeq ($(findstring darwin,$(HOST)),darwin)
+      # In macOS, shared lib filenames are of the form libfoo.dylib,
+      # libfoo.1.dylib, or libfoo.1.2.3.dylib
+      SONAME := lib$(COMPONENT).$(major-version)$(LIBEXT)
+      SHAREDLIBNAME := lib$(COMPONENT)$(LIBEXT)
+      OUTPUT := $(BUILDDIR)/lib$(COMPONENT).$(COMPONENT_VERSION)$(LIBEXT)
+    else
+      SHAREDLIBNAME := lib$(COMPONENT)$(LIBEXT)
+      SONAME := $(SHAREDLIBNAME).$(major-version)
+      OUTPUT := $(BUILDDIR)/$(SHAREDLIBNAME).$(COMPONENT_VERSION)
+    endif
   else
     OUTPUT := $(BUILDDIR)/lib$(COMPONENT)$(LIBEXT)
   endif
