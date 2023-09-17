@@ -216,10 +216,6 @@ endif
 
 ifeq ($(COMPONENT_TYPE),lib-shared)
   POST_TARGETS := __postshared $(POST_TARGETS)
-
-__postshared:
-	$(Q)$(LN) $(LNFLAGS) -f -s $(notdir $(OUTPUT)) $(BUILDDIR)/$(SONAME)
-	$(Q)$(LN) $(LNFLAGS) -f -s $(notdir $(OUTPUT)) $(BUILDDIR)/$(SHAREDLIBNAME)
 endif
 
 # Default target
@@ -228,6 +224,10 @@ all: $(PRE_TARGETS) $(OUTPUT) $(POST_TARGETS)
 # Build and execute testsuite 
 test: all $(TEST_PREREQS) $(TEST_BINARIES) $(TEST_TARGETS)
 	$(VQ)$(ECHO) $(ECHOFLAGS) "    TEST: Testing complete"
+
+__postshared:
+	$(Q)$(LN) $(LNFLAGS) -f -s $(notdir $(OUTPUT)) $(BUILDDIR)/$(SONAME)
+	$(Q)$(LN) $(LNFLAGS) -f -s $(notdir $(OUTPUT)) $(BUILDDIR)/$(SHAREDLIBNAME)
 
 # Compute coverage
 __precov: __partial_clean
