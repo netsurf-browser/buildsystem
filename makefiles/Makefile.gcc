@@ -67,12 +67,26 @@ endif
 # RISC OS module extensions
 ifeq ($(COMPONENT_TYPE),riscos-module)
   ifneq ($(HOST),arm-unknown-riscos)
-    $(error Attempting to build a RISC OS module for a non-RISC OS target)
+    # Note: this also rejects the gnueabi(hf) RISC OS hosts, too, as the
+    # tooling for those is not able to generate code compatible with RISC OS
+    # module environments.
+    $(error Attempting to build a RISC OS module for a non-RISC OS host)
   endif
 
   CFLAGS := $(CFLAGS) -mmodule
   CXXFLAGS := $(CXXFLAGS) -mmodule
   LDFLAGS := $(LDFLAGS) -mmodule
+endif
+
+# RISC OS backtrace extensions
+ifneq ($(findstring -riscos,$(HOST)),)
+  CFLAGS := $(CFLAGS) -mpoke-function-name
+  CXXFLAGS := $(CXXFLAGS) -mpoke-function-name
+  ifneq ($(findstring -gnueabi,$(HOST)),)
+    # Note: this assumes we're not generating RISC OS module code (see above)
+    CFLAGS := $(CFLAGS) -funwind-tables
+    CXXFLAGS := $(CXXFLAGS) -funwind-tables
+  endif
 endif
 
 ###############################################################################

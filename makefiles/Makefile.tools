@@ -185,9 +185,8 @@ else
       EXEEXT := ,ffa
     endif
 
-    # TODO: this assumes GCC
-    CFLAGS := $(CFLAGS) -mpoke-function-name -I$(GCCSDK_INSTALL_ENV)/include
-    CXXFLAGS := $(CXXFLAGS) -mpoke-function-name -I$(GCCSDK_INSTALL_ENV)/include
+    CFLAGS := $(CFLAGS) -I$(GCCSDK_INSTALL_ENV)/include
+    CXXFLAGS := $(CXXFLAGS) -I$(GCCSDK_INSTALL_ENV)/include
     LDFLAGS := $(LDFLAGS) -L$(GCCSDK_INSTALL_ENV)/lib
 
     CMHGFLAGS := -p -tgcc -32bit -apcs 3/32/nonreent/fpe2/noswst/nofpr/nofp
