@@ -3,7 +3,7 @@
 
 CCDEF := -D
 CCOPT := -O2
-CCNOOPT := -O0
+CCNOOPT := -Og
 CCDBG := -g
 CCINC := -I
 CCLIB := -L
@@ -12,7 +12,7 @@ CCSHR := -fPIC
 
 CXXDEF := -D
 CXXOPT := -O2
-CXXNOOPT := -O0
+CXXNOOPT := -Og
 CXXDBG := -g
 CXXINC := -I
 CXXLIB := -L
