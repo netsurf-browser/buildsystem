@@ -115,6 +115,7 @@ close(LOG);
 sub run_test
 {
 	my @errors;
+	my @cmdline = @_;
 
 	# Handles for communicating with the child
 	my ($out, $err);
@@ -124,7 +125,7 @@ sub run_test
 
 	# Invoke child
 	eval {
-		$pid = open3("&<NULL", $out, $err, @_);
+		$pid = open3("&<NULL", $out, $err, @cmdline);
 	};
 	die $@ if $@;
 
@@ -250,6 +251,14 @@ sub run_test
 		# Write any stderr output to the log
 		foreach my $error (@errors) {
 			print LOG "    $error\n";
+		}
+
+		# print command run and stderr of failing test
+		print "\n";
+		print "$_ " for @cmdline;
+		print "\n";
+		foreach my $error (@errors) {
+			print "$error\n";
 		}
 
 		print "\n\nFailure detected: consult log file\n\n\n";
