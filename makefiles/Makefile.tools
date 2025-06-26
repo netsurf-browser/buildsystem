@@ -221,7 +221,7 @@ else
     LDFLAGS := $(LDFLAGS) -L$(GCCSDK_INSTALL_ENV)/lib
 
     ifeq ($(HOST),m68k-unknown-amigaos)
-        CFLAGS += -fomit-frame-pointer -m68020
+        CFLAGS += -fomit-frame-pointer -m68020-60 -msoft-float
     endif
 
     PREFIX ?= $(GCCSDK_INSTALL_ENV)
