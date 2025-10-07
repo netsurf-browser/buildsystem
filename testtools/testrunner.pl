@@ -1,6 +1,6 @@
 #!/bin/perl
 #
-# Testcase runner for libhubbub
+# Testcase runner for netsurf libraries
 #
 # Usage: testrunner <builddir> <testdir> <prefix> [<executable extension>]
 #
@@ -32,8 +32,11 @@ my $prefix = shift @ARGV;
 my $exeext = "";
 $exeext = shift @ARGV if (@ARGV > 0);
 
+# log file name
+my $logfilename = $builddir . "/test.log";
+
 # Open log file and /dev/null
-open(LOG, ">$builddir/testlog") or die "Failed opening test log";
+open(LOG, ">$logfilename") or die "Failed opening test log";
 open(NULL, "+<", File::Spec->devnull) or die "Failed opening /dev/null";
 
 # Open testcase index
@@ -253,16 +256,22 @@ sub run_test
 			print LOG "    $error\n";
 		}
 
-		# print command run and stderr of failing test
 		print "\n";
-		print "$_ " for @cmdline;
-		print "\n";
-		foreach my $error (@errors) {
+		close(LOG);
+		if ($ENV{TEST_OUTPUT_ON_FAILURE}) {
+		    open (LOGFILE, '<', $logfilename) or die "Failed to open logfile for dump\n";
+		    print <LOGFILE>;
+		    close (LOGFILE);
+		} else {
+		    # print command run and stderr of failing test
+		    print "$_ " for @cmdline;
+		    print "\n";
+		    foreach my $error (@errors) {
 			print "$error\n";
+		    }
+
+		    print "\n\nFailure detected: consult log file $logfilename\n\n\n";
 		}
-
-		print "\n\nFailure detected: consult log file\n\n\n";
-
 		exit(1);
 	}
 }
