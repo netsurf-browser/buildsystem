@@ -195,8 +195,8 @@ else
     PREFIX ?= $(GCCSDK_INSTALL_ENV)
   endif
 
-  ifeq ($(HOST),i686-w64-mingw32)
-    # Cross compiling for Windows -- assumes mingw toolchain
+  ifeq ($(findstring -mingw32,$(HOST)),-mingw32)
+    # Cross compiling for Windows using mingw toolchain (either i686 or x86_64)
     GENHTML ?= echo
     LCOV ?= echo
     PKGCONFIG ?= PKG_CONFIG_LIBDIR="$(PREFIX)/lib/pkgconfig:$(GCCSDK_INSTALL_ENV)/lib/pkgconfig:$(GCCSDK_INSTALL_ENV)/share/pkgconfig" pkg-config
