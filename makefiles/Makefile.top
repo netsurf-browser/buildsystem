@@ -237,9 +237,11 @@ coverage: __precov test
 	$(Q)$(LCOV) --directory $(BUILDDIR) --base-directory $(CURDIR) \
 		--capture --output-file $(COVERAGEDIR)/$(COMPONENT)_tmp.info
 	$(Q)$(LCOV) --extract $(COVERAGEDIR)/$(COMPONENT)_tmp.info \
-		"$(CURDIR)/src*" -o $(COVERAGEDIR)/$(COMPONENT).info
+		"$(CURDIR)/src*" --ignore-errors inconsistent \
+		-o $(COVERAGEDIR)/$(COMPONENT).info
 	$(Q)$(RM) $(RMFLAGS) $(COVERAGEDIR)/$(COMPONENT)_tmp.info
-	$(Q)$(GENHTML) -o $(COVERAGEDIR) --num-spaces 2 \
+	$(Q)$(GENHTML) --ignore-errors range \
+		-o $(COVERAGEDIR) --num-spaces 2 \
 		$(COVERAGEDIR)/$(COMPONENT).info
 
 # Build and test sanitizers
