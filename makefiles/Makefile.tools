@@ -135,7 +135,7 @@ else
   endif
 
   # Search the path for the compiler
-  toolpath_ := $(shell /bin/which $(CC__))
+  toolpath_ := $(shell command -v $(CC__))
   ifeq ($(toolpath_),)
     toolpath_ := /opt/netsurf/$(HOST)/cross/bin/
     CC__  := $(toolpath_)$(HOST)-gcc
