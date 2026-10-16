@@ -156,7 +156,7 @@ sub run_test
 				# Skip bare new line.
 			} else {
 				# Split into lines
-				my @lines = split('\n', $input);
+				my @lines = split("\n", $input);
 
 				# Grab the last character of the input
 				my $lastchar = substr($input, -1, 1);
@@ -173,9 +173,9 @@ sub run_test
 							print LOG "$l\n";
 							$last .= $l;
 						# Last char of this read was 
-						# not '\n', so don't terminate
+						# not "\n", so don't terminate
 						# line in log.
-						} elsif ($lastchar ne '\n' &&
+						} elsif ($lastchar ne "\n" &&
 							$l eq $lines[-1]) {
 							print LOG "    $l";
 							$last = $l;
@@ -189,7 +189,7 @@ sub run_test
 
 					# Flag whether last line was incomplete
 					# for next time.
-					if ($lastchar ne '\n') {
+					if ($lastchar ne "\n") {
 						$outcont = 1;
 					} else {
 						$outcont = 0;
@@ -210,7 +210,7 @@ sub run_test
 					}
 
 					# Flag need for continuation
-					if ($lastchar ne '\n') {
+					if ($lastchar ne "\n") {
 						$errcont = 1;
 					} else {
 						$errcont = 0;
