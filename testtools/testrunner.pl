@@ -5,7 +5,7 @@
 # Usage: testrunner <builddir> <testdir> <prefix> [<executable extension>]
 #
 # Operates upon INDEX files described in the README.
-# Locates and executes testcases, feeding data files to programs 
+# Locates and executes testcases, feeding data files to programs
 # as appropriate.
 # Logs testcase output to file.
 # Aborts test sequence on detection of error.
@@ -63,7 +63,7 @@ while (my $line = <TINDEX>) {
 		# Testcase has external data files
 
 		# Open datafile index
-		open(DINDEX, "<$directory/data/$data/INDEX") or 
+		open(DINDEX, "<$directory/data/$data/INDEX") or
 			die "Failed opening $directory/data/$data/INDEX";
 
 		# Parse datafile index, looking for datafiles
@@ -87,7 +87,7 @@ while (my $line = <TINDEX>) {
 			print $msg;
 
 			# Run testcase
-			run_test("$builddir/$test", 
+			run_test("$builddir/$test",
 					"$directory/data/$data/$dtest");
 		}
 
@@ -168,11 +168,11 @@ sub run_test
 						# was incomplete, and this is
 						# the first line of this read
 						# Simply contatenate.
-						if ($outcont == 1 && 
+						if ($outcont == 1 &&
 							$l eq $lines[0]) {
 							print LOG "$l\n";
 							$last .= $l;
-						# Last char of this read was 
+						# Last char of this read was
 						# not "\n", so don't terminate
 						# line in log.
 						} elsif ($lastchar ne "\n" &&
@@ -198,9 +198,9 @@ sub run_test
 					# Child's stderr
 					if ($errcont == 1) {
 						# Continuation required,
-						# concatenate first line of 
-						# this read with last of 
-						# previous, then append the 
+						# concatenate first line of
+						# this read with last of
+						# previous, then append the
 						# rest from this read.
 						$errors[-1] .= $lines[0];
 						push(@errors, @lines[1 .. -1]);
